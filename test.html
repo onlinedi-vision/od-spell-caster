@@ -1,0 +1,19 @@
+<html>
+
+<head>
+<script>
+
+
+const socket = new WebSocket("ws://localhost:3000/chat");
+
+socket.onmessage = (event) => {
+  console.log(event.data);
+};
+
+socket.onopen = () => {
+  console.log("Connection established");
+  socket.send('secret'); // Sends a string message
+};
+</script>
+</head>
+</html>
