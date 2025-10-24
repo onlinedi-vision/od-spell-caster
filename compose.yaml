@@ -1,14 +1,6 @@
 services:
-  od-ash_tray:
+  od-spell-caster:
     build: .
     ports: 
-      - "0.0.0.0:4242:4242"
-    # environment:
-    #   - ASH_TRAY_ID
-    #   - ASH_TRAY_DIRECTORY=/cdn
-    #   - ASH_TRAY_KEY
-    #   - ASH_TRAY_PORT=7377
-    # volumes:
-    #   - /cdn:/cdn:rw
-    #   - /etc/letsencrypt/live/onlinedi.vision:/certs:r
+      - "0.0.0.0:6666:6666"
 
