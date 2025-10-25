@@ -1,62 +1,48 @@
-const spell_cast_api = 'https://onlinedi.vision/api/spell/cast';
+const consts = require('./consts.ts');
+const util = require('./util.ts');
 
 let spell_key = '';
 let all_ws = {'1313': []};
 let connected_ws = [];
 let secrets = [];
 
-async function addSecretToScylla(username) {
-  let payload = await fetch(
-    spell_cast_api,
-    {
-      method: 'POST',
-      body: {
-        'username': username
-      }
-    }
-  );
-
-  if(!payload.ok) {
-    console.log("[FAILED FETCH] [addSecretToScylla]" + username)
-    return 
-  }
-  
-  let secret = JSON.parse(await payload.json());
-  return [ secret['key'], secret['spell'] ];
-}
-
-async function includeAllServers(username) {}
-
-async function registerSpellKey() {}
+console.log("Starting Websockets Server on port: " + consts.port);
 
 Bun.serve({
+  port: consts.port,
   
   fetch(req, server) {
+
+    console.log('[LOG] [Bun.serve] Upgrading ' + req);
+    
     server.upgrade(req,{
       data: {
         username: new URL(req.url).searchParams.get('username')
       } 
-    })); 
+    }); 
     return new Response("Upgrade failed", { status: 500 });
   },
   
   websocket: {
-    data,
     async message(ws, message) {
-      console.log(all_ws);
-
+      console.log('[LOG] [message]');
+      
       if(!connected_ws.includes(ws) && secrets.includes(message)) {
         connected_ws.push(ws);
-        console.log(connected_ws);
-
-        let payload = await includeAllServers(data['username']);
         if(payload.ok) {
           ws.send("CONNECTED");
-          return
         } else {
           ws.send("ERROR");
         }
+        return;
       } 
+
+      if(message.startsWith("TOKEN:")) {
+        let token = await util.includeAllServers(data.username, message.split(":")[1]);
+
+        ws.send(token);
+        return;
+      }
     
       Object.keys(all_ws).forEach((key) => {
         if(all_ws[key].includes(ws)) {
@@ -69,7 +55,7 @@ Bun.serve({
     },
     
     async open(ws) {
-      let res = await addSecretToScylla(data['username']);
+      let res = await util.addSecretToScylla(data['username']);
       let [ key, spell ] = res;
       secrets.push(spell);
       ws.send(key);
