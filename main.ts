@@ -14,12 +14,14 @@ Bun.serve({
   fetch(req, server) {
 
     console.log('[LOG] [Bun.serve] Upgrading ' + req);
-    
-    server.upgrade(req,{
-      data: {
-        username: new URL(req.url).searchParams.get('username')
-      } 
-    }); 
+    const url = new URL(req.url);
+    if(url.pathname === "/wss") {
+      server.upgrade(req,{
+        data: {
+          username: url.searchParams.get('username')
+        } 
+      });
+    }
     return new Response("Upgrade failed", { status: 500 });
   },
   
