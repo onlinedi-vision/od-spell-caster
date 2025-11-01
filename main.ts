@@ -10,32 +10,32 @@ console.log("Starting Websockets Server on port: " + consts.port);
 
 async function includeAllServers(username, token) {
 	  console.log('ALL_WS: ' + all_ws);
-	    let payload = await fetch(
-		        consts.get_user_servers_api,
-			    {
-				          method: 'POST',
-					        headers: {"Content-Type": "application/json"},
-						      body: JSON.stringify({
-							              'username': username,
-								              'token': token
-									            })
-										        }
-											  );
-											    if(!payload.ok) {
-												        console.log(payload);
-													    return;
-													      }
+	  let payload = await fetch(
+			consts.get_user_servers_api,
+			{
+				method: 'POST',
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({
+					'username': username,
+					'token': token
+				})
+			}
+		);
+		if(!payload.ok) {
+			console.log(payload);
+			return;
+		}
 
-													        let get_user_servers_payload = await payload.json();
+		let get_user_servers_payload = await payload.json();
 
-														  for (let sid in get_user_servers_payload['s_list']) {
-															      if(!all_ws.has(sid)) {
-																            all_ws.set(sid, []);
-																	        }
-																		    all_ws.get(sid).push(sid);
-																		      }
+		for (let sid in get_user_servers_payload['s_list']) {
+			if(!all_ws.keys().has(sid)) {
+				all_ws.set(sid, []);
+			}
+			all_ws.get(sid).push(sid);
+		}
 
-																		        return token;
+		return token;
 }
 
 
