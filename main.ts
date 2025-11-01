@@ -10,7 +10,7 @@ console.log("Starting Websockets Server on port: " + consts.port);
 
 Bun.serve({
   port: consts.port,
-  
+  data: {} as WebSocketData,  
   fetch(req, server) {
 
     console.log('[LOG] [Bun.serve] Upgrading ' + req);
