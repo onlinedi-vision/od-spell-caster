@@ -1,22 +1,25 @@
 const consts = require('./consts.ts');
 
 async function addSecretToScylla(username) {
-  let payload = await fetch(
+    console.log("[addSecretToScylla]: " + consts.spell_cast_api + " " + username);
+    let payload = await fetch(
     consts.spell_cast_api,
     {
       method: 'POST',
-      body: {
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
         'username': username
-      }
+      })
     }
   );
 
   if(!payload.ok) {
-    console.log("[FAILED FETCH] [addSecretToScylla]" + username)
+    console.log("[FAILED FETCH] [addSecretToScylla] " + username)
     return 
   }
+  console.log(payload);
   
-  let secret = JSON.parse(await payload.json());
+  let secret = await payload.json();
   return [ secret['key'], secret['spell'] ];
 }
 

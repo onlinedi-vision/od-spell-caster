@@ -10,7 +10,6 @@ console.log("Starting Websockets Server on port: " + consts.port);
 
 Bun.serve({
   port: consts.port,
-  data: {} as WebSocketData,  
   fetch(req, server) {
 
     console.log('[LOG] [Bun.serve] Upgrading ' + req);
@@ -26,6 +25,7 @@ Bun.serve({
   },
   
   websocket: {
+    data: {},  
     async message(ws, message) {
       console.log('[LOG] [message]');
       
@@ -57,7 +57,7 @@ Bun.serve({
     },
     
     async open(ws) {
-      let res = await util.addSecretToScylla(data['username']);
+      let res = await util.addSecretToScylla(ws.data['username']);
       let [ key, spell ] = res;
       secrets.push(spell);
       ws.send(key);
