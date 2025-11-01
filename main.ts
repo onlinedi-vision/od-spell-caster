@@ -8,7 +8,7 @@ let secrets = [];
 
 console.log("Starting Websockets Server on port: " + consts.port);
 
-async function includeAllServers(username, token) {
+async function includeAllServers(username, token, ws) {
 	  console.log('ALL_WS: ' + all_ws);
 	  let payload = await fetch(
 			consts.get_user_servers_api,
@@ -27,13 +27,13 @@ async function includeAllServers(username, token) {
 		}
 
 		let get_user_servers_payload = await payload.json();
-
-		for (let sid in get_user_servers_payload['s_list']) {
-			if(!all_ws.keys().has(sid)) {
-				all_ws.set(sid, []);
+		get_user_servers_payload['s_list'].forEach((sid) => {
+			console.log(sid);
+			if(!Object.keys(all_ws).includes(sid)) {
+				all_ws[sid]= new Array();
 			}
-			all_ws.get(sid).push(sid);
-		}
+			all_ws[sid].push(ws);
+		});
 
 		return token;
 }
@@ -68,19 +68,17 @@ Bun.serve({
       } 
 
       if(message.startsWith("TOKEN:")) {
-        let token = await includeAllServers(ws.data.username, message.split(":")[1]);
+        let token = await includeAllServers(ws.data.username, message.split(":")[1], ws);
 
         ws.send(token);
         return;
       }
-    
-      Object.keys(all_ws).forEach((key) => {
+      let key = message.split(':')[0];
         if(all_ws[key].includes(ws)) {
           all_ws[key].forEach((kws) => {
             kws.send(message);
           });
         }
-      })
 
     },
     
