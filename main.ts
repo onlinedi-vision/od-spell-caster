@@ -57,7 +57,8 @@ Bun.serve({
   },
   
   websocket: {
-    data: {},  
+    data: {},
+    idleTimeout: 60 * 5,
     async message(ws, message) {
       console.log('[LOG] [message]');
       
