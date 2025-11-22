@@ -64,7 +64,7 @@ Bun.serve({
       
       if(!connected_ws.includes(ws) && secrets.includes(message)) {
         connected_ws.push(ws);
-          ws.send("CONNECTED");
+        ws.send("CONNECTED");
         return;
       } 
 
@@ -74,6 +74,12 @@ Bun.serve({
         ws.send(token);
         return;
       }
+
+      if(message == "PING") {
+        ws.send("PONG");
+        return;
+      }
+
       let key = message.split(':')[0];
         if(all_ws[key].includes(ws)) {
           all_ws[key].forEach((kws) => {
