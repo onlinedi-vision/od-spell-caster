@@ -38,7 +38,34 @@ async function includeAllServers(username, token, ws) {
 		return token;
 }
 
+async function updateUserServers(username, token, sid, ws) {
+	  let payload = await fetch(
+			consts.am_i_in_server_api,
+			{
+				method: 'POST',
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({
+					'username': username,
+					'sid': sid,
+					'token': token
+				})
+			}
+		);
+		if(!payload.ok) {
+			console.log(payload);
+			return;
+		}
 
+		if(payload.body.localeCompare("Yes you are part of the server.") == 0) {
+			if(!Object.keys(all_ws).includes(sid)) {
+				all_ws[sid]= new Array();
+			}
+			if(!all_ws[sid].includes(ws)) {
+				all_ws.push(ws);
+			}
+		}
+  
+}
 
 Bun.serve({
   port: consts.port,
@@ -78,6 +105,15 @@ Bun.serve({
       if(message == "PING") {
         ws.send("PONG");
         return;
+      }
+
+      if(message.startsWith("UPDATE:")) {
+      	let m_split = message.split(':');
+      	let token = m_split[0];
+      	let sid = m_split[1];
+
+				await updateUserServers(ws.data.username, token, sid, ws); 
+      	return;
       }
 
       let key = message.split(':')[0];
