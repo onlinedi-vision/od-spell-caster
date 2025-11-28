@@ -56,7 +56,8 @@ async function updateUserServers(username, token, sid, ws) {
 			return;
 		}
 
-		if(payload.body.localeCompare("Yes you are part of the server.") == 0) {
+		let body = await payload.text();
+		if(body.localeCompare("Yes you are part of the server.") == 0) {
 			if(!Object.keys(all_ws).includes(sid)) {
 				all_ws[sid]= new Array();
 			}
