@@ -62,7 +62,7 @@ async function updateUserServers(username, token, sid, ws) {
 				all_ws[sid]= new Array();
 			}
 			if(!all_ws[sid].includes(ws)) {
-				all_ws.push(ws);
+				all_ws[sid].push(ws);
 			}
 		}
   
