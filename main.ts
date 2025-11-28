@@ -109,8 +109,8 @@ Bun.serve({
 
       if(message.startsWith("UPDATE:")) {
       	let m_split = message.split(':');
-      	let token = m_split[0];
-      	let sid = m_split[1];
+      	let token = m_split[1];
+      	let sid = m_split[2];
 
 				await updateUserServers(ws.data.username, token, sid, ws); 
       	return;
