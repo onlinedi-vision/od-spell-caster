@@ -1,0 +1,21 @@
+variable "GIT_BRANCH" {}
+
+group "default" {
+    targets = ["release"]
+}
+
+function "tag" {
+    params = [branch]
+    result = "v${split("/", branch)[length(split("/", branch)) - 1]}"
+}
+
+target "release" {
+    context = "."
+    dockerfile = "Dockerfile"
+    target = "runtime"
+
+    output = ["type=cacheonly"]
+
+    tags = ["registry.onlinedi.vision:5000/od-spell-caster:${tag(GIT_BRANCH)}"]
+}
+

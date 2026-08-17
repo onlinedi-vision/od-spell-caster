@@ -1,6 +1,7 @@
 services:
   od-spell-caster:
-    build: .
+    image: "${OD_SPELL_CASTER_IMAGE:?OD_SPELL_CASTER_IMAGE must be set}"
+    pull_policy: always
     ports: 
       - "127.0.0.1:6666:6666"
 

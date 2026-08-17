@@ -1,15 +1,19 @@
-name: Bun CI
+name: Bun Container CI
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches:
+     - main
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: 'latest'
-    - run: bun test
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and test container image
+        env:
+          GIT_BRANCH: refs/heads/${{ github.head_ref }}
+        run: docker buildx bake -f docker-bake.hcl
