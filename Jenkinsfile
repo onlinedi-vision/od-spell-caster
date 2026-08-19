@@ -39,12 +39,11 @@ pipeline {
 	}
 
 	stage('Push Image') {
+
 		when {
-			allOf {
-				branch 'main'
-				not {
-					changeRequest()
-				}
+			branch 'main'
+			not {
+				changeRequest()
 			}
 		}
 
@@ -54,7 +53,7 @@ pipeline {
 					url: 'https://registry.onlinedi.vision:5000',
 					credentialsId: 'docker-registry'
 				) {
-					sh 'docker buildx bake -f docker-bake.hcl --push'
+					sh 'docker buildx bake -f docker-bake.hcl --set release.output=type=registry'
 				}
 			}
 		}
@@ -62,11 +61,9 @@ pipeline {
 
 	stage('Deploy') {
 		when {
-			allOf {
-				branch 'main'
-				not {
-					changeRequest()
-				}
+			branch 'main'
+			not {
+				changeRequest()
 			}
 		}
 

@@ -10,12 +10,9 @@ function "tag" {
 }
 
 target "release" {
-    context = "."
-    dockerfile = "Dockerfile"
     target = "runtime"
 
     output = ["type=cacheonly"]
 
     tags = ["registry.onlinedi.vision:5000/od-spell-caster:${tag(GIT_BRANCH)}"]
 }
-
