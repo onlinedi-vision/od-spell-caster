@@ -7,7 +7,7 @@ COPY --link *.ts .
 FROM base AS builder
 RUN bun build ./main.ts --compile --outfile spell --minify
 
-FROM alpine AS runtime
+FROM alpine:edge AS runtime
 WORKDIR /app
 RUN apk add --no-cache libstdc++
 COPY --link --from=builder /app/spell /app/spell
