@@ -3,24 +3,6 @@ def imageTag() {
 	return "registry.onlinedi.vision:5000/od-spell-caster:v${branchName}"
 }
 
-def buildAndScanImage = {
-	def tag = imageTag()
-
-	sh 'docker buildx bake -f docker-bake.hcl --set release.output=type=docker'
-
-	sh """
-		docker run --rm \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		aquasec/trivy:0.36.0 image \
-		--format table \
-		--exit-code 1 \
-		--ignore-unfixed \
-		--vuln-type os,library \
-		--severity CRITICAL,HIGH \
-		'${tag}'
-	"""
-}
-
 pipeline {
   agent any
 
@@ -30,14 +12,6 @@ pipeline {
   }
   
   stages {
-	stage('Test Build and Scan'){
-		steps {
-			script {
-				buildAndScanImage()
-			}
-		}
-	}
-
 	stage('Push Image') {
 
 		when {

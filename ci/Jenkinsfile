@@ -1,0 +1,77 @@
+def buildAndScanImage = {
+    def imageTag = "od-spell-caster:${env.GIT_COMMIT}"
+
+    sh """
+        docker buildx bake \
+            -f docker-bake.hcl \
+            --set release.output='type=docker' \
+            --set release.tags='${imageTag}'
+    """
+
+    sh """
+        docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.36.0 image \
+            --format table \
+            --exit-code 1 \
+            --ignore-unfixed \
+            --vuln-type os,library \
+            --severity CRITICAL,HIGH \
+            '${imageTag}'
+    """
+}
+
+pipeline {
+    agent any
+
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 2, unit: 'HOURS')
+    }
+
+    stages {
+        stage('Pull Request Checks') {
+            when {
+                changeRequest()
+            }
+
+            steps {
+                withChecks(name: 'Build and Scan Image') {
+                    script {
+                        buildAndScanImage()
+                    }
+                }
+            }
+        }
+
+        stage('Main Branch Checks') {
+            when {
+                allOf {
+                    branch 'main'
+                    not {
+                        changeRequest()
+                    }
+                }
+            }
+
+            steps {
+                withChecks(name: 'Build and Scan Image') {
+                    script {
+                        buildAndScanImage()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            emailext(
+                from: 'jenkins@mail.onlinedi.vision',
+                subject: "Build Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                body: "The build failed. Check the console output at ${env.BUILD_URL}.",
+                to: 'TEAM@mail.onlinedi.vision'
+            )
+        }
+    }
+}
